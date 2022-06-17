@@ -1,7 +1,6 @@
 on: push
 # change the above to use on > push > tags > - "v*.*.*"
 env:
-  # PREVIOUS_TAG:
   CURRENT_TAG: ${{ github.ref_name }}
 
 jobs: 
@@ -10,8 +9,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # https://github.com/actions/checkout#fetch-all-history-for-all-tags-and-branches
+
+      - name: Get previous tag
+        id: get_previous_tag
+        run: echo "::set-output name=PREVIOUS_TAG::$(git describe --abbrev=0 --tags `git rev-list --tags --skip=1 --max-count=1`)"
+
       - name: Generate changelog
-        run: echo "# Current Tag - ${{ github.ref_name }}" > ${{ github.workspace }}--CHANGELOG.txt
+        run: echo "$(git log $CURRENT_TAG...${{ steps.get_previous_tag.outputs.PREVIOUS_TAG }} --oneline --no-decorate)" > ${{ github.workspace }}--CHANGELOG.txt
+        
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags')
