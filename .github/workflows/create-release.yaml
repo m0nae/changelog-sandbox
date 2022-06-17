@@ -5,6 +5,7 @@ on:
 
 env:
   CURRENT_TAG: ${{ github.ref_name }}
+  CHANGELOG_FILE: ${{ github.workspace }}--CHANGELOG.txt
 
 jobs: 
   build:
@@ -20,7 +21,9 @@ jobs:
         run: echo "::set-output name=PREVIOUS_TAG::$(git describe --abbrev=0 --tags `git rev-list --tags --skip=1 --max-count=1`)"
 
       - name: Generate changelog
-        run: echo "$(git log $CURRENT_TAG...${{ steps.get_previous_tag.outputs.PREVIOUS_TAG }} --oneline --no-decorate)" > ${{ github.workspace }}--CHANGELOG.txt
+        run: | 
+          echo "##### $(date +'%Y-%m-%d') / $(date +'%B %d, %Y')" > $CHANGELOG_FILE
+          echo "$(git log $CURRENT_TAG...${{ steps.get_previous_tag.outputs.PREVIOUS_TAG }} --oneline --no-decorate)" > $CHANGELOG_FILE
 
       - name: Release
         uses: softprops/action-gh-release@v1
