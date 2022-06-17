@@ -1,5 +1,9 @@
 on: push
 # change the above to use on > push > tags > - "v*.*.*"
+env:
+  # PREVIOUS_TAG:
+  CURRENT_TAG: ${{ github.ref_name }}
+
 jobs: 
   build:
     runs-on: ubuntu-latest
@@ -7,7 +11,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Generate changelog
-        run: echo "# Hello World" > ${{ github.workspace }}--CHANGELOG.txt
+        run: echo "# Current Tag - ${{ github.ref_name }}" > ${{ github.workspace }}--CHANGELOG.txt
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags')
