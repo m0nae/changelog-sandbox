@@ -1,1 +1,1 @@
-This is file #1.
+File #1.
